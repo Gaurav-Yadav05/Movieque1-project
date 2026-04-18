@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Login - Movique</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      background-color: #141414;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px;
+      width: 250px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #e50914;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ff1e2d;
+    }
+
+    a {
+      color: #e50914;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Welcome Back 🎬</h2>
+
+  <div class="form-container">
+
+  <input type="text" id="username" placeholder="Enter username"><br>
+  <input type="password" id="password" placeholder="Enter password"><br>
+
+  <button class="btn" onclick="login()">Login</button>
+
+</div>
+
+  <p>Don't have an account? <a href="register.html">Register here</a></p>
+
+  <script>
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      // ✅ Validation
+      if (!username || !password) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log("LOGIN RESPONSE:", data);
+
+          if (data.status === "success") {
+
+            // ✅ Store user
+            localStorage.setItem("token", data.token);   // ✅ store token
+localStorage.setItem("user", data.user.username);
+
+            // ✅ Redirect to dashboard
+            window.location.href = "dashboard.html";
+
+          } else {
+            alert("Invalid Credentials ❌");
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          alert("Server error");
+        });
+    }
+  </script>
+
+</body>
+
+</html>

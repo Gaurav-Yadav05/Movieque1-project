@@ -1,0 +1,141 @@
+/* ✅ GLOBAL */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #141414;
+    color: white;
+}
+
+/* ✅ NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: black;
+}
+
+.logo {
+    color: #e50914;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+/* ✅ LINKS & BUTTONS */
+a, button {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+a:hover, button:hover {
+    color: #e50914;
+}
+
+/* ✅ PRIMARY BUTTON */
+.btn {
+    background: #e50914;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    background: #ff1e2d;
+}
+
+/* ✅ HERO SECTION (Landing Page) */
+.hero {
+    height: 100vh;  /* ✅ full screen height */
+    background: url('https://images.unsplash.com/photo-1524985069026-dd778a71c7b4') no-repeat center center/cover;
+    
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;   /* ✅ TOP alignment */
+    
+    padding-top: 80px;         /* ✅ space from navbar */
+}
+
+.hero-overlay {
+    background: rgba(0,0,0,0.7);
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    margin-top: 20px;   /* ✅ keeps it near top */
+}
+
+.hero h1 {
+    font-size: 50px;
+}
+
+.hero p {
+    font-size: 18px;
+    color: #ccc;
+}
+
+/* ✅ FORM (Login & Register) */
+.form-container {
+    text-align: center;
+    margin-top: 100px;
+}
+
+input {
+    padding: 10px;
+    margin: 10px;
+    width: 250px;
+    border-radius: 5px;
+    border: none;
+}
+
+form button {
+    background: #e50914;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+form button:hover {
+    background: #ff1e2d;
+}
+
+/* ✅ MOVIES GRID (Dashboard) */
+.movies-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* ✅ MOVIE CARD */
+.movie-card {
+    background: #1f1f1f;
+    border-radius: 10px;
+    padding: 10px;
+    transition: 0.3s;
+}
+
+.movie-card:hover {
+    transform: scale(1.05);
+}
+
+.movie-card img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.movie-title {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.movie-info {
+    font-size: 14px;
+    color: #aaa;
+}
+
+/* ✅ DASHBOARD CONTAINER */
+.container {
+    padding: 20px;
+}

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Movique Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            background-color: #141414;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 30px;
+            background-color: #000;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e50914;
+        }
+
+        .navbar button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .navbar button:hover {
+            color: #e50914;
+        }
+
+        /* Movies */
+        .container {
+            padding: 20px;
+        }
+
+        .movie-card {
+            background: #1f1f1f;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        
+    </style>
+</head>
+
+<body>
+
+    <!-- ✅ LOGIN PROTECTION -->
+    <script>
+    const user = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+
+    if (!user || !token) {
+        window.location.href = "login.html";
+    }
+</script>
+
+    <!-- ✅ Navbar -->
+    <div class="navbar">
+        <div class="logo">🎬 Movique</div>
+
+        <div>
+            👋 <span id="username"></span>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- ✅ Movie Section -->
+    <div class="container">
+        <h2>Movie List 🎬</h2>
+        <div id="movieList" class="movies-container"></div>
+
+        <h2>Your Watchlist ⭐</h2>
+    <div id="watchlist"></div>
+    </div>
+
+    <!-- ✅ Script -->
+    <script>
+
+    // ✅ Show username
+    document.getElementById("username").innerText = user;
+
+    // ✅ Fetch movies
+    fetch("http://localhost:5000/api/movies")
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById("movieList");
+
+            container.innerHTML = "";
+
+            data.forEach(movie => {
+                const div = document.createElement("div");
+                div.classList.add("movie-card");
+
+                div.innerHTML = `
+                    <img src="${movie.poster}" style="width:150px; border-radius:10px;" />
+                    <h3>${movie.title}</h3>
+                    <p>${movie.genre} (${movie.year})</p>
+                `;
+
+                container.appendChild(div);
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            alert("Error loading movies");
+        });
+
+    // ✅ 🔥 ADD THIS (WATCHLIST FUNCTION)
+    function loadWatchlist() {
+        const token = localStorage.getItem("token");
+
+        fetch("http://localhost:5000/api/watchlist", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("WATCHLIST:", data);
+
+            const container = document.getElementById("watchlist");
+            container.innerHTML = "";
+
+            data.forEach(movie => {
+                const div = document.createElement("div");
+                div.classList.add("movie-card");
+
+                div.innerHTML = `
+                    <img src="${movie.poster}" style="width:150px; border-radius:10px;" />
+                    <h3>${movie.title}</h3>
+                    <p>${movie.genre} (${movie.year})</p>
+                `;
+
+                container.appendChild(div);
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            alert("Error loading watchlist");
+        });
+    }
+
+    // ✅ CALL FUNCTION
+    loadWatchlist();
+
+    // ✅ Logout (FIXED)
+    function logout() {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
+    }
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieQue - Watchlist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">MovieQue 🎬</div>
+        
+        <div class="search-container">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B3B3B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Search for a movie...">
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html">home</a>
+            <a href="watchlist.html">My Watchlist</a>
+            <a href="#">Logout</a>
+        </div>
+    </nav>
+
+    <div class="watchlist-container">
+        
+        <div class="watchlist-header">
+            <h2>Welcome Back !</h2>
+            <span>you have 4 movies in your watchlist</span>
+        </div>
+
+        <div class="watchlist-item">
+            <div class="movie-info">
+                <img src="https://via.placeholder.com/60x80/1a1a1a/ffffff?text=Inception" alt="Inception">
+                <div class="movie-details">
+                    <h3>Inception</h3>
+                    <p>Sc-Fi / Action</p>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-yellow">Edit Rating</button>
+                <button class="btn-red" onclick="removeMovie(this)">Remove</button>
+            </div>
+        </div>
+
+        <div class="watchlist-item">
+            <div class="movie-info">
+                <img src="https://via.placeholder.com/60x80/1a1a1a/ffffff?text=Interstellar" alt="Interstellar">
+                <div class="movie-details">
+                    <h3>Interstellar</h3>
+                    <p>Sc-Fi / Drama</p>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-yellow">Edit Rating</button>
+                <button class="btn-red" onclick="removeMovie(this)">Remove</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

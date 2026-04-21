@@ -6,95 +6,167 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #141414;
-      color: white;
-      text-align: center;
-    }
-
-    /* Navbar */
-    .navbar {
+    /* HERO (SCI-FI BACKGROUND) */
+    .hero-section {
+      height: 85vh;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.5)),
+        url("https://images.unsplash.com/photo-1446776811953-b23d57bd21aa") center/cover no-repeat;
       display: flex;
-      justify-content: space-between;
-      padding: 15px 30px;
-      background-color: #000;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 60px;
     }
 
-    .logo {
-      font-size: 22px;
-      font-weight: bold;
-      color: #e50914;
-      }
+    .hero-section h1 {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
 
-    .nav-links a {
-      margin-left: 15px;
+    .hero-section p {
+      max-width: 500px;
+      color: #ccc;
+      margin-bottom: 30px;
+    }
+
+    .btn-red {
+      background: #E50914;
+      padding: 12px 25px;
+      border-radius: 6px;
       color: white;
       text-decoration: none;
-      cursor: pointer;
+      margin-right: 10px;
     }
 
-    .nav-links a:hover {
-      color: #e50914;
-    }
-
-    /* Hero Section */
-    .hero {
-      margin-top: 100px;
-    }
-
-    .hero h1 {
-      font-size: 40px;
-      margin-bottom: 10px;
-    }
-
-    .hero p {
-      font-size: 18px;
-      color: #aaa;
-    }
-
-    .buttons {
-      margin-top: 30px;
-    }
-
-    .buttons a {
-      padding: 10px 20px;
-      margin: 10px;
-      background-color: #e50914;
-      color: white;
+    .btn-outline {
+      border: 1px solid white;
+      padding: 12px 25px;
+      border-radius: 6px;
       text-decoration: none;
-      border-radius: 5px;
+      color: white;
     }
 
-    .buttons a:hover {
-      background-color: #ff1e2d;
+    /* 🔍 SEARCH BAR (TOP FULL WIDTH) */
+    .search-top {
+      width: 100%;
+      padding: 15px 40px;
+      background: #1a1a1a;
+      border-bottom: 1px solid #333;
+    }
+
+    .search-top input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      outline: none;
+    }
+
+    /* MOVIES */
+    .movies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 30px 60px;
+    }
+
+    .movie-card {
+      background: #1a1a1a;
+      border-radius: 10px;
+      text-align: center;
+      overflow: hidden;
+      transition: 0.3s;
+    }
+
+    .movie-card:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+    }
+
+    .movie-card img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .movie-card h4 {
+      padding: 10px;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- ✅ Navbar -->
-  <div class="navbar">
+  <!-- NAVBAR -->
+  <nav class="navbar">
     <div class="logo">🎬 Movique</div>
 
     <div class="nav-links">
       <a href="login.html">Login</a>
       <a href="register.html">Register</a>
     </div>
+  </nav>
+
+  <!-- 🔍 SEARCH AT TOP -->
+  <div class="search-top">
+    <input type="text" placeholder="🔍 Search movies..." onkeyup="searchMovies(this.value)">
   </div>
 
-  <!-- ✅ Hero Section -->
-  <div class="hero">
-    <h1>Unlimited Movies 🎥</h1>
-    <p>Track, Review & Discover your favorite films</p>
+  <!-- HERO -->
+  <section class="hero-section">
+    <h1>Explore the Sci-Fi Universe 🚀</h1>
+    <p>Discover futuristic worlds, advanced tech, and mind-bending stories.</p>
 
-    <div class="buttons">
-      <a href="login.html">Get Started</a>
-      <a href="register.html">Create Account</a>
+    <div>
+      <a href="login.html" class="btn-red">Get Started</a>
+      <a href="register.html" class="btn-outline">Create Account</a>
     </div>
-  </div>
+  </section>
+
+  <!-- MOVIES -->
+  <div class="movies-grid" id="movies"></div>
+
+  <script>
+
+    const movies = [
+      { title: "Inception", img: "https://image.tmdb.org/t/p/w300/qJ2tW6WMUDux911r6m7haRef0WH.jpg" },
+      { title: "Interstellar", img: "https://image.tmdb.org/t/p/w300/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" },
+      { title: "The Dark Knight", img: "https://image.tmdb.org/t/p/w300/q719jXXEzOoYaps6babgKnONONX.jpg" },
+      { title: "Tenet", img: "https://image.tmdb.org/t/p/w300/2CAL2433ZeIihfX1Hb2139CX0pW.jpg" },
+      { title: "Avengers", img: "https://image.tmdb.org/t/p/w300/6agKYU5IQFpuDyUYPu39w7UCRrJ.jpg" },
+      { title: "Joker", img: "https://image.tmdb.org/t/p/w300/xBHvZcjRiWyobQ9kxBhO6B2dtRI.jpg" },
+      { title: "Spider-Man", img: "https://image.tmdb.org/t/p/w300/9O1Iy9od7s0e3aZV4KqzK0lYzM9.jpg" }
+    ];
+
+    function displayMovies(list) {
+      const container = document.getElementById("movies");
+      container.innerHTML = "";
+
+      list.forEach(m => {
+        const div = document.createElement("div");
+        div.classList.add("movie-card");
+
+        div.innerHTML = `
+      <img src="${m.img}">
+      <h4>${m.title}</h4>
+    `;
+
+        container.appendChild(div);
+      });
+    }
+
+    // 🔍 MAKE FUNCTION GLOBAL AGAIN
+    function searchMovies(query) {
+      const filtered = movies.filter(m =>
+        m.title.toLowerCase().includes(query.toLowerCase())
+      );
+      displayMovies(filtered);
+    }
+
+    // INIT
+    displayMovies(movies);
+
+  </script>
 
 </body>
 

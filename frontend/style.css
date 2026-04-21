@@ -1,82 +1,95 @@
-/* ✅ GLOBAL */
-body {
+/* ================== GLOBAL RESET ================== */
+* {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #141414;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ================== BODY ================== */
+body {
+    background-color: #121212;
     color: white;
 }
 
-/* ✅ NAVBAR */
+/* ================== NAVBAR ================== */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 30px;
-    background: black;
+    padding: 15px 40px;
+    background-color: #1a1a1a;
+    border-bottom: 1px solid #333;
 }
 
 .logo {
-    color: #e50914;
+    font-size: 24px;
     font-weight: bold;
-    font-size: 22px;
+    color: #e50914;
 }
 
-/* ✅ LINKS & BUTTONS */
-a, button {
+/* ================== SEARCH ================== */
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: #2a2a2a;
+    border-radius: 20px;
+    padding: 8px 15px;
+    width: 300px;
+}
+
+.search-container input {
+    background: transparent;
+    border: none;
+    color: white;
+    outline: none;
+    margin-left: 10px;
+    width: 100%;
+}
+
+/* ================== LINKS ================== */
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+a {
     color: white;
     text-decoration: none;
-    margin-left: 15px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
 }
 
-a:hover, button:hover {
+a:hover {
     color: #e50914;
 }
 
-/* ✅ PRIMARY BUTTON */
+/* ================== BUTTONS ================== */
 .btn {
     background: #e50914;
     padding: 10px 20px;
     border-radius: 5px;
 }
 
-.btn:hover {
-    background: #ff1e2d;
+.btn-red {
+    background-color: #E50914;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
-/* ✅ HERO SECTION (Landing Page) */
-.hero {
-    height: 100vh;  /* ✅ full screen height */
-    background: url('https://images.unsplash.com/photo-1524985069026-dd778a71c7b4') no-repeat center center/cover;
-    
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;   /* ✅ TOP alignment */
-    
-    padding-top: 80px;         /* ✅ space from navbar */
+.btn-yellow {
+    background-color: #FFC107;
+    color: black;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
-.hero-overlay {
-    background: rgba(0,0,0,0.7);
-    padding: 30px;
-    border-radius: 10px;
-    text-align: center;
-    margin-top: 20px;   /* ✅ keeps it near top */
-}
-
-.hero h1 {
-    font-size: 50px;
-}
-
-.hero p {
-    font-size: 18px;
-    color: #ccc;
-}
-
-/* ✅ FORM (Login & Register) */
+/* ================== FORM ================== */
 .form-container {
     text-align: center;
     margin-top: 100px;
@@ -90,29 +103,43 @@ input {
     border: none;
 }
 
-form button {
-    background: #e50914;
-    padding: 10px 20px;
-    border-radius: 5px;
+/* ================== HERO ================== */
+.hero {
+    height: 100vh;
+    background: url('https://images.unsplash.com/photo-1524985069026-dd778a71c7b4') no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 80px;
 }
 
-form button:hover {
-    background: #ff1e2d;
+.hero-overlay {
+    background: rgba(0,0,0,0.7);
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
 }
 
-/* ✅ MOVIES GRID (Dashboard) */
-.movies-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+/* ================== DASHBOARD ================== */
+.container {
     padding: 20px;
 }
 
-/* ✅ MOVIE CARD */
+/* GRID */
+#movieList, #watchlist {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding-top: 20px;
+}
+
+/* MOVIE CARD */
 .movie-card {
-    background: #1f1f1f;
+    background-color: #1e1e1e;
     border-radius: 10px;
-    padding: 10px;
+    text-align: center;
+    overflow: hidden;
+    padding-bottom: 10px;
     transition: 0.3s;
 }
 
@@ -122,20 +149,66 @@ form button:hover {
 
 .movie-card img {
     width: 100%;
-    border-radius: 10px;
+    height: 220px;
+    object-fit: cover;
 }
 
-.movie-title {
-    font-weight: bold;
-    margin-top: 10px;
+.movie-card h3 {
+    margin: 10px 0 5px;
+}
+
+.movie-card p {
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* ================== WATCHLIST (OPTIONAL UI) ================== */
+.watchlist-container {
+    padding: 40px 50px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.watchlist-header {
+    margin-bottom: 30px;
+}
+
+.watchlist-header h2 {
+    font-size: 32px;
+}
+
+.watchlist-header span {
+    background-color: #2a2a2a;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 14px;
+    color: #aaaaaa;
+}
+
+.watchlist-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1a1a1a;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
 }
 
 .movie-info {
-    font-size: 14px;
-    color: #aaa;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
-/* ✅ DASHBOARD CONTAINER */
-.container {
-    padding: 20px;
+.movie-info img {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
 }

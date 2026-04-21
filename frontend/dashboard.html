@@ -3,7 +3,6 @@
 
 <head>
     <title>Movique Dashboard</title>
-    <link rel="stylesheet" href="style.css">
 
     <style>
         body {
@@ -13,7 +12,6 @@
             margin: 0;
         }
 
-        /* Navbar */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -27,143 +25,215 @@
             color: #e50914;
         }
 
-        .navbar button {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-
-        .navbar button:hover {
-            color: #e50914;
-        }
-
-        /* Movies */
         .container {
             padding: 20px;
         }
 
-        .movie-card {
-            background: #1f1f1f;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 8px;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
         }
 
-        
+        .movie-card {
+            background: #1f1f1f;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .movie-card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 8px;
+            background: #e50914;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- ✅ LOGIN PROTECTION -->
     <script>
-    const user = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
+        const BASE_URL = "http://127.0.0.1:5000";
 
-    if (!user || !token) {
-        window.location.href = "login.html";
-    }
-</script>
+        const user = localStorage.getItem("user");
+        const token = localStorage.getItem("token");
 
-    <!-- ✅ Navbar -->
+        if (!user || !token) {
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <!-- NAV -->
     <div class="navbar">
         <div class="logo">🎬 Movique</div>
-
         <div>
             👋 <span id="username"></span>
             <button onclick="logout()">Logout</button>
         </div>
     </div>
 
-    <!-- ✅ Movie Section -->
+    <!-- CONTENT -->
     <div class="container">
-        <h2>Movie List 🎬</h2>
-        <div id="movieList" class="movies-container"></div>
 
-        <h2>Your Watchlist ⭐</h2>
-    <div id="watchlist"></div>
+        <h2>Movies 🎬</h2>
+        <div id="movieList" class="grid"></div>
+
+        <h2>Watchlist ⭐</h2>
+        <div id="watchlist" class="grid"></div>
+
     </div>
 
-    <!-- ✅ Script -->
     <script>
 
-    // ✅ Show username
-    document.getElementById("username").innerText = user;
+        document.getElementById("username").innerText = user;
 
-    // ✅ Fetch movies
-    fetch("http://localhost:5000/api/movies")
-        .then(res => res.json())
-        .then(data => {
-            const container = document.getElementById("movieList");
 
-            container.innerHTML = "";
+        // =========================
+        // SAFE FETCH (IMPORTANT FIX)
+        // =========================
+        async function fetchAPI(url, options = {}) {
+            try {
+                const res = await fetch(BASE_URL + url, {
+                    ...options,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    }
+                });
 
-            data.forEach(movie => {
-                const div = document.createElement("div");
-                div.classList.add("movie-card");
+                const data = await res.json();
 
-                div.innerHTML = `
-                    <img src="${movie.poster}" style="width:150px; border-radius:10px;" />
-                    <h3>${movie.title}</h3>
-                    <p>${movie.genre} (${movie.year})</p>
-                `;
+                if (!res.ok) {
+                    throw new Error(data.message || "Server Error");
+                }
 
-                container.appendChild(div);
-            });
-        })
-        .catch(err => {
-            console.log(err);
-            alert("Error loading movies");
-        });
+                return data;
 
-    // ✅ 🔥 ADD THIS (WATCHLIST FUNCTION)
-    function loadWatchlist() {
-        const token = localStorage.getItem("token");
-
-        fetch("http://localhost:5000/api/watchlist", {
-            headers: {
-                "Authorization": "Bearer " + token
+            } catch (err) {
+                console.error("API ERROR:", err.message);
+                throw err;
             }
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log("WATCHLIST:", data);
+        }
 
-            const container = document.getElementById("watchlist");
-            container.innerHTML = "";
 
-            data.forEach(movie => {
-                const div = document.createElement("div");
-                div.classList.add("movie-card");
+        // =========================
+        // LOAD MOVIES
+        // =========================
+        async function loadMovies() {
+            try {
+                const data = await fetchAPI("/api/movies");
 
-                div.innerHTML = `
-                    <img src="${movie.poster}" style="width:150px; border-radius:10px;" />
+                const container = document.getElementById("movieList");
+                container.innerHTML = "";
+
+                data.forEach(movie => {
+                    container.innerHTML += `
+                <div class="movie-card">
+                    <img src="${movie.poster || ''}">
                     <h3>${movie.title}</h3>
                     <p>${movie.genre} (${movie.year})</p>
-                `;
 
-                container.appendChild(div);
-            });
-        })
-        .catch(err => {
-            console.log(err);
-            alert("Error loading watchlist");
-        });
-    }
+                    <button onclick="addToWatchlist(${movie.id})">
+                        ⭐ Add to Watchlist
+                    </button>
+                </div>
+            `;
+                });
 
-    // ✅ CALL FUNCTION
-    loadWatchlist();
+            } catch (err) {
+                alert("Movies not loading ❌ Check backend / login / token");
+            }
+        }
 
-    // ✅ Logout (FIXED)
-    function logout() {
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        window.location.href = "index.html";
-    }
 
-</script>
+        // =========================
+        // ADD
+        // =========================
+        async function addToWatchlist(movieId) {
+            try {
+                await fetchAPI("/api/watchlist/add", {
+                    method: "POST",
+                    body: JSON.stringify({ movie_id: movieId })
+                });
+
+                loadWatchlist();
+
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
+
+        // =========================
+        // LOAD WATCHLIST
+        // =========================
+        async function loadWatchlist() {
+            try {
+                const data = await fetchAPI("/api/watchlist");
+
+                const container = document.getElementById("watchlist");
+                container.innerHTML = "";
+
+                data.forEach(movie => {
+                    container.innerHTML += `
+                <div class="movie-card">
+                    <img src="${movie.poster || ''}">
+                    <h3>${movie.title}</h3>
+                    <p>${movie.genre} (${movie.year})</p>
+
+                    <button onclick="removeFromWatchlist(${movie.movie_id})">
+                        ❌ Remove
+                    </button>
+                </div>
+            `;
+                });
+
+            } catch (err) {
+                alert("Watchlist not loading ❌ Check backend / DB / auth");
+            }
+        }
+
+
+        // =========================
+        // REMOVE
+        // =========================
+        async function removeFromWatchlist(movieId) {
+            try {
+                await fetchAPI(`/api/watchlist/remove/${movieId}`, {
+                    method: "DELETE"
+                });
+
+                loadWatchlist();
+
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
+
+        // =========================
+        // LOGOUT
+        // =========================
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+
+        // INIT
+        loadMovies();
+        loadWatchlist();
+
+    </script>
 
 </body>
 

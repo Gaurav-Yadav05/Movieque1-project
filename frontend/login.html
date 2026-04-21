@@ -6,12 +6,57 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
+    /* 🌌 BACKGROUND SLIDESHOW */
     body {
-      background-color: #141414;
-      color: white;
+      margin: 0;
       font-family: Arial, sans-serif;
+      color: white;
       text-align: center;
-      margin-top: 100px;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .bg-slide {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      z-index: -1;
+    }
+
+    .bg-slide.active {
+      opacity: 1;
+    }
+
+    /* 🧊 GLASS LOGIN BOX */
+    .form-container {
+      margin-top: 120px;
+      display: inline-block;
+      padding: 30px;
+      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
+      margin-top: 80px;
     }
 
     input {
@@ -44,6 +89,14 @@
 
 <body>
 
+  <!-- 🌌 BACKGROUND IMAGES -->
+  <div class="bg-slide active"
+    style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee')"></div>
+  <div class="bg-slide" style="background-image:url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa')">
+  </div>
+  <div class="bg-slide" style="background-image:url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564')">
+  </div>
+
   <h2>Welcome Back 🎬</h2>
 
   <div class="form-container">
@@ -56,52 +109,68 @@
   <p>Don't have an account? <a href="register.html">Register here</a></p>
 
   <script>
-    function login() {
-      console.log("LOGIN BUTTON CLICKED");
+    // 🌌 BACKGROUND SLIDER
+    let slides = document.querySelectorAll(".bg-slide");
+    let index = 0;
 
+    setInterval(() => {
+      slides[index].classList.remove("active");
+      index = (index + 1) % slides.length;
+      slides[index].classList.add("active");
+    }, 4000);
+  </script>
+
+  <script>
+    async function login() {
+      console.log("LOGIN BUTTON CLICKED");
 
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
 
-      // ✅ Validation
       if (!username || !password) {
         alert("Please fill all fields ❌");
         return;
       }
 
-      fetch("http://127.0.0.1:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ username, password })
-      })
-        .then(res => res.json())
-        .then(data => {
-          console.log("LOGIN RESPONSE:", data);
-          console.log("CALLING API:", "http://127.0.0.1:5000/api/auth/login");
+      try {
+        console.log("CALLING API...");
 
-          // ❌ If login fails
-          if (!data.token) {
-            alert("Invalid Credentials ❌");
-            return;
-          }
-
-          // ✅ Store token (VERY IMPORTANT)
-          localStorage.setItem("token", data.token);
-
-          // optional user info
-          localStorage.setItem("user", data.user?.username || username);
-
-          alert("Login successful ✅");
-
-          // ✅ Redirect
-          window.location.href = "dashboard.html";
-        })
-        .catch(err => {
-          console.error("Login error:", err);
-          alert("Server error ❌");
+        const res = await fetch("http://127.0.0.1:5000/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ username, password })
         });
+
+        console.log("STATUS:", res.status);
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Server error response:", text);
+          alert("Server error ❌ (Check backend terminal)");
+          return;
+        }
+
+        const data = await res.json();
+        console.log("LOGIN RESPONSE:", data);
+
+        if (!data.token) {
+          alert("Invalid Credentials ❌");
+          return;
+        }
+
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", data.user?.username || username);
+
+        alert("Login successful ✅");
+
+        window.location.href = "dashboard.html";
+
+      } catch (err) {
+        console.error("FETCH ERROR:", err);
+        alert("Cannot connect to server ❌ (Is backend running?)");
+      }
     }
   </script>
 

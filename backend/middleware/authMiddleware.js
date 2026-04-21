@@ -1,27 +1,34 @@
 const jwt = require("jsonwebtoken");
 
-function verifyToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
+module.exports = function (req, res, next) {
+    const authHeader = req.headers["authorization"];
 
-  if (!authHeader) {
-    return res.status(403).json({ message: "No token provided ❌" });
-  }
+    if (!authHeader) {
+        return res.status(401).json({ message: "No token provided" });
+    }
 
-  // ✅ Extract token from "Bearer TOKEN"
-  const token = authHeader.split(" ")[1];
+    let token = authHeader;
 
-  if (!token) {
-    return res.status(403).json({ message: "Invalid token format ❌" });
-  }
+    if (authHeader.startsWith("Bearer ")) {
+        token = authHeader.slice(7);
+    }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secretkey");
-    req.user = decoded;
-    next();
-  } catch (err) {
-    console.log(err);
-    return res.status(401).json({ message: "Unauthorized ❌" });
-  }
-}
+    if (!process.env.JWT_SECRET) {
+        console.error("JWT_SECRET is missing in .env");
+        return res.status(500).json({ message: "Server misconfigured" });
+    }
 
-module.exports = verifyToken;
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        req.user = decoded;
+        next();
+
+    } catch (err) {
+        console.error("JWT ERROR:", err.message);
+
+        return res.status(401).json({
+            message: "Invalid token"
+        });
+    }
+};

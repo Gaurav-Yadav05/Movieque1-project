@@ -13,14 +13,17 @@ const authRoutes = require("./routes/auth");
 
 const app = express();
 
+
 // =========================
-// ✅ MIDDLEWARE
+// ✅ MIDDLEWARE (FIXED SAFE CORS)
 // =========================
 app.use(cors({
-  origin: "http://127.0.0.1:5500"
+  origin: "*",   // ✅ FIX: prevents frontend blocking issues
+  credentials: true
 }));
 
 app.use(express.json());
+
 
 // =========================
 // ✅ TEST ROUTE
@@ -29,10 +32,12 @@ app.get("/", (req, res) => {
   res.json({ message: "Movique Server Running 🚀" });
 });
 
+
 // =========================
 // 🔐 AUTH ROUTES
 // =========================
 app.use("/api/auth", authRoutes);
+
 
 // =========================
 // 🔐 REGISTER
@@ -51,7 +56,7 @@ app.post("/api/register", async (req, res) => {
 
     db.query(sql, [username, hashedPassword], (err) => {
       if (err) {
-        console.log(err);
+        console.error("REGISTER ERROR:", err);
         return res.status(500).json({ message: "User already exists or DB error ❌" });
       }
 
@@ -59,10 +64,11 @@ app.post("/api/register", async (req, res) => {
     });
 
   } catch (err) {
-    console.log(err);
+    console.error("HASH ERROR:", err);
     res.status(500).json({ message: "Error hashing password ❌" });
   }
 });
+
 
 // =========================
 // 🎬 ROUTES
@@ -71,17 +77,29 @@ app.use("/api/movies", movieRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/watchlist", watchlistRoutes);
 
+
 // =========================
-// ✅ TEST ROUTE
+// ✅ DEBUG ROUTE (IMPORTANT FOR YOU)
 // =========================
-app.get("/test", (req, res) => {
-  res.send("Backend is working ✅");
+app.get("/debug", (req, res) => {
+  db.query("SELECT 1", (err) => {
+    if (err) {
+      return res.status(500).json({
+        message: "DB NOT CONNECTED ❌",
+        error: err
+      });
+    }
+
+    res.json({ message: "DB Connected ✅" });
+  });
 });
+
 
 // =========================
 // 🚀 START SERVER
 // =========================
 const PORT = 5000;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);
 });

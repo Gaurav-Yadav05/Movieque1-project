@@ -8,24 +8,42 @@ const auth = require("../middleware/authMiddleware");
 // ➕ ADD TO WATCHLIST
 // =========================
 router.post("/add", auth, (req, res) => {
-  const userId = req.user.id;
-  const { movie_id } = req.body;
+    const userId = req.user.id;
+    const { movie_id } = req.body;
 
-  // ✅ Validation
-  if (!movie_id) {
-    return res.status(400).json({ message: "Movie ID is required ❌" });
-  }
-
-  const sql = "INSERT INTO watchlist (user_id, movie_id) VALUES (?, ?)";
-
-  db.query(sql, [userId, movie_id], (err) => {
-    if (err) {
-      console.log("ADD ERROR:", err);
-      return res.status(500).json({ message: "Error adding to watchlist ❌" });
+    if (!movie_id) {
+        return res.status(400).json({ message: "movie_id is required" });
     }
 
-    res.json({ message: "Added to watchlist ⭐" });
-  });
+    const checkQuery = `
+        SELECT * FROM watchlist 
+        WHERE user_id = ? AND movie_id = ?
+    `;
+
+    db.query(checkQuery, [userId, movie_id], (err, result) => {
+        if (err) {
+            console.error("DB ERROR (CHECK):", err);
+            return res.status(500).json({ message: "Database error" });
+        }
+
+        if (result.length > 0) {
+            return res.status(409).json({ message: "Already in watchlist" });
+        }
+
+        const insertQuery = `
+            INSERT INTO watchlist (user_id, movie_id)
+            VALUES (?, ?)
+        `;
+
+        db.query(insertQuery, [userId, movie_id], (err2) => {
+            if (err2) {
+                console.error("DB ERROR (INSERT):", err2);
+                return res.status(500).json({ message: "Insert failed ❌" });
+            }
+
+            res.json({ message: "Added to watchlist ⭐" });
+        });
+    });
 });
 
 
@@ -33,23 +51,28 @@ router.post("/add", auth, (req, res) => {
 // 📥 GET WATCHLIST
 // =========================
 router.get("/", auth, (req, res) => {
-  const userId = req.user.id;
+    const userId = req.user.id;
 
-  const sql = `
-    SELECT movies.*
-    FROM movies
-    JOIN watchlist ON movies.id = watchlist.movie_id
-    WHERE watchlist.user_id = ?
-  `;
+    const query = `
+        SELECT 
+            m.id AS movie_id,
+            m.title,
+            m.poster,
+            m.genre,
+            m.year
+        FROM watchlist w
+        JOIN movies m ON w.movie_id = m.id
+        WHERE w.user_id = ?
+    `;
 
-  db.query(sql, [userId], (err, result) => {
-    if (err) {
-      console.log("FETCH ERROR:", err);
-      return res.status(500).json({ message: "Error fetching watchlist ❌" });
-    }
+    db.query(query, [userId], (err, result) => {
+        if (err) {
+            console.error("FETCH ERROR:", err);
+            return res.status(500).json({ message: "Error loading watchlist ❌" });
+        }
 
-    res.json(result);
-  });
+        res.json(result);
+    });
 });
 
 
@@ -57,20 +80,22 @@ router.get("/", auth, (req, res) => {
 // ❌ REMOVE FROM WATCHLIST
 // =========================
 router.delete("/remove/:movie_id", auth, (req, res) => {
-  const userId = req.user.id;
-  const movieId = req.params.movie_id;
+    const userId = req.user.id;
+    const movieId = req.params.movie_id;
 
-  const sql = "DELETE FROM watchlist WHERE user_id=? AND movie_id=?";
+    const deleteQuery = `
+        DELETE FROM watchlist 
+        WHERE user_id = ? AND movie_id = ?
+    `;
 
-  db.query(sql, [userId, movieId], (err) => {
-    if (err) {
-      console.log("DELETE ERROR:", err);
-      return res.status(500).json({ message: "Error removing from watchlist ❌" });
-    }
+    db.query(deleteQuery, [userId, movieId], (err) => {
+        if (err) {
+            console.error("DELETE ERROR:", err);
+            return res.status(500).json({ message: "Delete failed ❌" });
+        }
 
-    res.json({ message: "Removed from watchlist ❌" });
-  });
+        res.json({ message: "Removed from watchlist ❌" });
+    });
 });
-
 
 module.exports = router;

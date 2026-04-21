@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const db = require("./db");
 const express = require("express");
-const cors = require("cors");
+
 const bcrypt = require("bcrypt");
 const movieRoutes = require("./routes/movies");
 const reviewRoutes = require("./routes/reviews");
@@ -11,8 +11,18 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
+const authRoutes = require("./routes/auth");
+app.use("/api/auth", authRoutes);
+
+const cors = require("cors");
+
+app.use(cors({
+  origin: "http://127.0.0.1:5500",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));  
+
 // ✅ MIDDLEWARE
-app.use(cors());
 app.use(express.json());
 
 // ✅ TEST ROUTE
@@ -115,4 +125,10 @@ app.use("/api/watchlist", watchlistRoutes);
 // 🚀 START SERVER
 app.listen(5000, () => {
   console.log("Server running on port 5000 🚀");
+});
+
+
+
+app.get("/test", (req, res) => {
+  res.send("Backend is working ✅");
 });

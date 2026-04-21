@@ -47,28 +47,29 @@
   <h2>Welcome Back 🎬</h2>
 
   <div class="form-container">
+    <input type="text" id="username" placeholder="Enter username"><br>
+    <input type="password" id="password" placeholder="Enter password"><br>
 
-  <input type="text" id="username" placeholder="Enter username"><br>
-  <input type="password" id="password" placeholder="Enter password"><br>
-
-  <button class="btn" onclick="login()">Login</button>
-
-</div>
+    <button onclick="login()">Login</button>
+  </div>
 
   <p>Don't have an account? <a href="register.html">Register here</a></p>
 
   <script>
     function login() {
+      console.log("LOGIN BUTTON CLICKED");
+
+
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
 
       // ✅ Validation
       if (!username || !password) {
-        alert("Please fill all fields");
+        alert("Please fill all fields ❌");
         return;
       }
 
-      fetch("http://localhost:5000/login", {
+      fetch("http://127.0.0.1:5000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -78,23 +79,28 @@
         .then(res => res.json())
         .then(data => {
           console.log("LOGIN RESPONSE:", data);
+          console.log("CALLING API:", "http://127.0.0.1:5000/api/auth/login");
 
-          if (data.status === "success") {
-
-            // ✅ Store user
-            localStorage.setItem("token", data.token);   // ✅ store token
-localStorage.setItem("user", data.user.username);
-
-            // ✅ Redirect to dashboard
-            window.location.href = "dashboard.html";
-
-          } else {
+          // ❌ If login fails
+          if (!data.token) {
             alert("Invalid Credentials ❌");
+            return;
           }
+
+          // ✅ Store token (VERY IMPORTANT)
+          localStorage.setItem("token", data.token);
+
+          // optional user info
+          localStorage.setItem("user", data.user?.username || username);
+
+          alert("Login successful ✅");
+
+          // ✅ Redirect
+          window.location.href = "dashboard.html";
         })
         .catch(err => {
-          console.log(err);
-          alert("Server error");
+          console.error("Login error:", err);
+          alert("Server error ❌");
         });
     }
   </script>

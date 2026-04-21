@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
+
 const db = require("../db");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // =========================
@@ -9,36 +11,53 @@ const jwt = require("jsonwebtoken");
 router.post("/login", (req, res) => {
   console.log("🔥 LOGIN API HIT");
 
-  
   const { username, password } = req.body;
 
-  const sql = "SELECT * FROM users WHERE username=? AND password=?";
+  if (!username || !password) {
+    return res.status(400).json({ message: "All fields required ❌" });
+  }
 
-  db.query(sql, [username, password], (err, result) => {
+  const sql = "SELECT * FROM users WHERE username=?";
+
+  db.query(sql, [username], async (err, result) => {
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error ❌" });
     }
 
     if (result.length === 0) {
-      return res.json({ message: "Invalid credentials ❌" });
+      return res.json({ message: "User not found ❌" });
     }
 
     const user = result[0];
 
-    // ✅ create token
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      "secretkey"
-    );
+    try {
+      // ✅ Compare hashed password
+      const isMatch = await bcrypt.compare(password, user.password);
 
-    res.json({
-      token,
-      user: {
-        id: user.id,
-        username: user.username
+      if (!isMatch) {
+        return res.json({ message: "Invalid password ❌" });
       }
-    });
+
+      // ✅ Create token
+      const token = jwt.sign(
+        { id: user.id, username: user.username },
+        process.env.JWT_SECRET || "secretkey",
+        { expiresIn: "1d" }
+      );
+
+      res.json({
+        token,
+        user: {
+          id: user.id,
+          username: user.username
+        }
+      });
+
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Error comparing password ❌" });
+    }
   });
 });
 

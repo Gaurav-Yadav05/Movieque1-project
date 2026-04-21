@@ -1,44 +1,47 @@
 require("dotenv").config();
 
-const db = require("./db");
 const express = require("express");
-
+const cors = require("cors");
 const bcrypt = require("bcrypt");
+
+const db = require("./db");
+
 const movieRoutes = require("./routes/movies");
 const reviewRoutes = require("./routes/reviews");
 const watchlistRoutes = require("./routes/watchlist");
-const jwt = require("jsonwebtoken"); 
+const authRoutes = require("./routes/auth");
 
 const app = express();
 
-const authRoutes = require("./routes/auth");
-app.use("/api/auth", authRoutes);
-
-const cors = require("cors");
-
-app.use(cors({
-  origin: "http://127.0.0.1:5500",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));  
-
+// =========================
 // ✅ MIDDLEWARE
+// =========================
+app.use(cors({
+  origin: "http://127.0.0.1:5500"
+}));
+
 app.use(express.json());
 
+// =========================
 // ✅ TEST ROUTE
+// =========================
 app.get("/", (req, res) => {
   res.json({ message: "Movique Server Running 🚀" });
 });
 
+// =========================
+// 🔐 AUTH ROUTES
+// =========================
+app.use("/api/auth", authRoutes);
 
 // =========================
 // 🔐 REGISTER
 // =========================
-app.post("/register", async (req, res) => {
+app.post("/api/register", async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ message: "All fields required" });
+    return res.status(400).json({ message: "All fields required ❌" });
   }
 
   try {
@@ -49,7 +52,7 @@ app.post("/register", async (req, res) => {
     db.query(sql, [username, hashedPassword], (err) => {
       if (err) {
         console.log(err);
-        return res.status(500).json({ message: "User already exists or DB error" });
+        return res.status(500).json({ message: "User already exists or DB error ❌" });
       }
 
       res.json({ message: "User Registered Successfully ✅" });
@@ -57,78 +60,28 @@ app.post("/register", async (req, res) => {
 
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Error hashing password" });
+    res.status(500).json({ message: "Error hashing password ❌" });
   }
 });
 
-
 // =========================
-// 🔐 LOGIN
+// 🎬 ROUTES
 // =========================
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ status: "fail", message: "All fields required" });
-  }
-
-  const sql = "SELECT * FROM users WHERE username=?";
-
-  db.query(sql, [username], async (err, result) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ status: "fail", message: "Server error" });
-    }
-
-    if (result.length === 0) {
-      return res.json({ status: "fail", message: "User not found" });
-    }
-
-    const user = result[0];
-
-    try {
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (isMatch) {
-  const token = jwt.sign(
-    { id: user.id },
-    process.env.JWT_SECRET,
-    { expiresIn: "1d" }
-  );
-
-  res.json({
-    status: "success",
-    token: token,   // ✅ IMPORTANT
-    user: {
-      id: user.id,
-      username: user.username
-    }
-  });
-}else {
-        res.json({ status: "fail", message: "Invalid password" });
-      }
-
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ status: "fail", message: "Error comparing password" });
-    }
-  });
-});
-
-
-// 🎬 MOVIES ROUTE
 app.use("/api/movies", movieRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/watchlist", watchlistRoutes);
 
-
-// 🚀 START SERVER
-app.listen(5000, () => {
-  console.log("Server running on port 5000 🚀");
-});
-
-
-
+// =========================
+// ✅ TEST ROUTE
+// =========================
 app.get("/test", (req, res) => {
   res.send("Backend is working ✅");
+});
+
+// =========================
+// 🚀 START SERVER
+// =========================
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} 🚀`);
 });
